@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Extensions.Configuration;
 using RepasoDapper.Entities.Authors;
 using RepasoDapper.Entities.Books;
 using RepasoDapper.Servicies.Authors;
@@ -10,6 +11,8 @@ IInitDataBaseServices initDataBaseServices = new InitDataBaseServices();
 IAuthorsServices authorsServices = new AuthorsServices();
 IBooksServices booksServices = new BooksServices();
 
+var configurationBuilder = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json");
 
 //? ==================== LLAMADAS A MÉTODOS ==============================
 
