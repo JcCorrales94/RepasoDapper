@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RepasoDapper.Entities.Authors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,9 @@ namespace RepasoDapper.Entities.Books
         public int Id { get; set; }
         public string Title { get; set; }
         public int AuthorId { get; set; }
+        public Author Author { get; set; }
         public int PublishedYear { get; set; }
         public int Sales { get; set; }
+
     }
 }

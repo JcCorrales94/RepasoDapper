@@ -1,4 +1,5 @@
 D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\bin\Debug\net6.0\RepasoDapper.Repositorie.deps.json
+D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\bin\Debug\net6.0\RepasoDapper.Repositorie.runtimeconfig.json
 D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\bin\Debug\net6.0\RepasoDapper.Repositorie.dll
 D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\bin\Debug\net6.0\RepasoDapper.Repositorie.pdb
 D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\bin\Debug\net6.0\RepasoDapper.Entities.dll
@@ -12,4 +13,5 @@ D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-A
 D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\obj\Debug\net6.0\RepasoDapper.Repositorie.dll
 D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\obj\Debug\net6.0\refint\RepasoDapper.Repositorie.dll
 D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\obj\Debug\net6.0\RepasoDapper.Repositorie.pdb
+D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\obj\Debug\net6.0\RepasoDapper.Repositorie.genruntimeconfig.cache
 D:\Rocio\Documents\Formacion\Programación\CodeHouse\mi código\Teoria\.NET\05-AccesoDatos\ListaEjercicios05\06- Dapper\RepasoDapper\RepasoDapper\RepasoDapper.Repositorie\obj\Debug\net6.0\ref\RepasoDapper.Repositorie.dll

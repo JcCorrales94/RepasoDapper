@@ -10,22 +10,27 @@ namespace RepasoDapper.Servicies.Books
 {
     public class BooksServices : IBooksServices
     {
-        IBooksRepository booksRepository = new BooksRepository();
+        readonly IBooksRepository _booksRepository;
+
+        public BooksServices(IBooksRepository booksRepository)
+        {
+            _booksRepository = booksRepository;
+        }
 
         public void Clean()
         {
-            booksRepository.Clean();
+            _booksRepository.Clean();
         }
 
         public int Delete(int Id)
         {
             if (Id <= 0) throw new ArgumentException("Debes enviar un ID correcto");
-            return booksRepository.Delete(Id);
+            return _booksRepository.Delete(Id);
         }
 
         public List<Book> GetAll()
         {
-            return booksRepository.GetAll();
+            return _booksRepository.GetAll();
         }
 
         public int Insert(List<Book> books)
@@ -38,7 +43,7 @@ namespace RepasoDapper.Servicies.Books
                 if (book.Sales < 0) throw new ArgumentException("Las ventas no pueden ser negativas");
             }
                 
-            return booksRepository.Insert(books);
+            return _booksRepository.Insert(books);
         }
 
 
@@ -46,7 +51,7 @@ namespace RepasoDapper.Servicies.Books
         {
             if (Id <= 0) throw new ArgumentException("El ID no corresponde a ninguno de nuestra base de datos");
             if (Title == null) throw new ArgumentNullException("Debes introduccir un titulo");
-            return booksRepository.Update(Id, Title);
+            return _booksRepository.Update(Id, Title);
         }
     }
 }

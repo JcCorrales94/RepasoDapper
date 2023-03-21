@@ -12,64 +12,62 @@ namespace RepasoDapper.Servicies.Init
 {
     public class InitDataBaseServices : IInitDataBaseServices
     {
-        IAuthorsServices authorsServices = new AuthorsServices();
-        IBooksServices BooksServices = new BooksServices();
+        readonly IAuthorsServices _authorsServices;
+        readonly IBooksServices _booksServices;
+
+        public InitDataBaseServices(IAuthorsServices authorsServices, IBooksServices booksServices)
+        {
+            _authorsServices = authorsServices;
+            _booksServices = booksServices;
+        }
+
         public void CleanDB()
         {
-            authorsServices.Clean();
-            BooksServices.Clean();
+            _authorsServices.Clean();
+            _booksServices.Clean();
         }
 
         public void InsertInitialData()
         {
-            var author = new Author { Name = "Miguel de Cervantes" };
-            var authorInsertedId = authorsServices.Insert(author);
-            var authorsBooks = new List<Book>
-            {
-                new Book{ Title = "Don Quijote de la Mancha", PublishedYear = 1605, Sales = 500, AuthorId = authorInsertedId }
-            };
-
-            author = new Author { Name = "Charles Dickens" };
-            authorInsertedId = authorsServices.Insert(author);
-            authorsBooks.Add(new Book { Title = "Historia de dos ciudades", PublishedYear = 1859, Sales = 200, AuthorId = authorInsertedId });
-
-            author = new Author { Name = "J. R. R. Tolkien" };
-            authorInsertedId = authorsServices.Insert(author);
-            authorsBooks.AddRange(new List<Book>
-            {
-                new Book{ Title = "El Señor de los Anillos", PublishedYear = 1978, Sales = 150, AuthorId = authorInsertedId },
-                new Book{ Title = "El hobbit", PublishedYear = 1982, Sales = 100, AuthorId = authorInsertedId },
-            });
-
-            author = new Author { Name = "Antoine de Saint-Exupéry" };
-            authorInsertedId = authorsServices.Insert(author);
-            authorsBooks.Add(new Book { Title = "El principito", PublishedYear = 1951, Sales = 140, AuthorId = authorInsertedId });
-
-            author = new Author { Name = "Cao Xueqin" };
-            authorInsertedId = authorsServices.Insert(author);
-            authorsBooks.Add(new Book { Title = "Sueño en el pabellón rojo", PublishedYear = 1792, Sales = 100, AuthorId = authorInsertedId });
-
-            author = new Author { Name = "Lewis Car" };
-            authorInsertedId = authorsServices.Insert(author);
-            authorsBooks.Add(new Book { Title = "Las aventuras de Alicia en el país de las maravillas", PublishedYear = 1865, Sales = 100, AuthorId = authorInsertedId });
-
-            author = new Author { Name = "Agatha Christie" };
-            authorInsertedId = authorsServices.Insert(author);
-            authorsBooks.Add(new Book { Title = "Diez negritos", PublishedYear = 1939, Sales = 100, AuthorId = authorInsertedId });
-
-            author = new Author { Name = "C. S. Lewis" };
-            authorInsertedId = authorsServices.Insert(author);
-            authorsBooks.Add(new Book { Title = "El león, la bruja y el armario", PublishedYear = 1950, Sales = 85, AuthorId = authorInsertedId });
-
-            author = new Author { Name = "Dan Brown" };
-            authorInsertedId = authorsServices.Insert(author);
-            authorsBooks.Add(new Book { Title = "El código Da Vinci", PublishedYear = 2003, Sales = 80, AuthorId = authorInsertedId });
-
-            author = new Author { Name = "J. D. Salinger" };
-            authorInsertedId = authorsServices.Insert(author);
-            authorsBooks.Add(new Book { Title = "El guardián entre el centeno", PublishedYear = 1951, Sales = 65, AuthorId = authorInsertedId });
-
-            BooksServices.Insert(authorsBooks);
+            insertAuthor();
+            insertBooks();
         }
+
+        public void insertAuthor()
+        {
+            var authorsCSV = File.ReadAllLines("CSVs\\Import\\Authors.csv");
+            List<Author> authorList = new List<Author>();
+            for(int i = 1; i < authorsCSV.Length; i++)
+            {
+                string authorCSV = authorsCSV[i];
+                var authorCSVSplitted = authorCSV.Split(';');
+                authorList.Add(new Author { Name = authorCSVSplitted[1]});
+            }
+            foreach(Author author in authorList)
+            {
+                _authorsServices.Insert(author);
+            }
+        }
+
+        public void insertBooks()
+        {
+            var booksCSV = File.ReadAllLines("CSVs\\Import\\Books.csv");
+            List<Book> bookList = new List<Book>();
+            for (int i = 1; i < booksCSV.Length; i++)
+            {
+                string bookCSV = booksCSV[i];
+                var bookCSVSplitted = bookCSV.Split(";");
+
+                bookList.Add(new Book
+                {
+                    AuthorId = int.Parse(bookCSVSplitted[2]),
+                    Title = bookCSVSplitted[1],
+                    PublishedYear = int.Parse((bookCSVSplitted[3])),
+                    Sales = int.Parse((bookCSVSplitted[4]))
+                });
+            }
+            _booksServices.Insert(bookList);
+        }
+
     }
 }

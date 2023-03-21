@@ -1,139 +1,163 @@
 ﻿
-using Microsoft.Extensions.Configuration;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using RepasoDapper.Configuration;
 using RepasoDapper.Entities.Authors;
 using RepasoDapper.Entities.Books;
+using RepasoDapper.Repositorie;
+using RepasoDapper.Repositorie.Authors;
+using RepasoDapper.Repositorie.Books;
 using RepasoDapper.Servicies.Authors;
 using RepasoDapper.Servicies.Books;
 using RepasoDapper.Servicies.Init;
 
+var serviceProvider = new ServiceCollection()
+    .configureServices()
+    .ConfigureRepositories()
+    .AddConfigurationConfigFile()
+    .ConfigureDataBase()
+    .BuildServiceProvider();
 
-IInitDataBaseServices initDataBaseServices = new InitDataBaseServices();
-IAuthorsServices authorsServices = new AuthorsServices();
-IBooksServices booksServices = new BooksServices();
+IInitDataBaseServices initDataBaseServices = serviceProvider.GetService<IInitDataBaseServices>();
+IAuthorsServices authorsServices = serviceProvider.GetService<IAuthorsServices>();
+IBooksServices booksServices = serviceProvider.GetService<IBooksServices>();
 
-var configurationBuilder = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json");
 
-//? ==================== LLAMADAS A MÉTODOS ==============================
 
+
+
+//? HACEMOS RESET DE LA BASE DE DATOS DE DATOS ANTERIORES
 CleanInitDBData();
+
+//? HACEMOS LA INSERCCIÓN DE DATOS A LA BASE DE DATOS
 InsertInitialData();
 
-
-//? ========== Apartado 1 y 2 =========
-// Hacer un método que inserte varios autores y libros (InsertInitialData)
-
+//? SOLICITAMOS A LA BASE DE DATOS TODOS LOS AUTORES
 GetAllAuthors();
 
+//? SOLICITAMOS A LA BASE DE DATOS TODOS LOS LIBROS
 GetAllBooks();
 
-//? =========== Apartado 3 =============
-// Hacer un método que busque por nombre de autor y devuelva el author y el total de libros escritos
-
+//? SOLICITAMOS AUTOR CON LOS LIBROS PUBLICADOS
 GetPublishedBooksByAuthor("J. R. R. Tolkien");
 
-//? =========== Apartado 4 y 5 =============
-// Eliminar un autor y un libro por su ID
-
+//? ELIMINAMOS UN AUTOR POR SU ID
 DeleteAuthorById(1);
-
+//? ELIMINAMOS UN LIBRO POR SU ID
 DeleteBookById(2);
 
-//? =========== Apartado 6 =================
-// Actualizar el titulo de un libro por su ID
+//? ACTUALIZAMOS EL TITULO DE UN LIBRO POR EL ID DEL LIBRO
 UpdateBookTitle(3, "El Señor de los Anillos Versión Extendida");
-GetAllBooks();
 
 
-//? ============================= MÉTODOS ==================================
+
 void CleanInitDBData()
 {
-    Console.WriteLine("Limpiando los datos de la Base de Datos");
+    Console.WriteLine("Limpiando los datos de la BD");
     initDataBaseServices.CleanDB();
+    Console.WriteLine();
 }
+
 void InsertInitialData()
 {
-    Console.WriteLine("Insertado Datos Iniciales");
+    Console.WriteLine("Insertando datos iniciales");
     initDataBaseServices.InsertInitialData();
+    Console.WriteLine();
 }
 
 void GetAllAuthors()
 {
-    Console.WriteLine("Devolviendo lista de Autores");
-    var author = authorsServices.GetAll();
-    ShowAuthorsData(author);
+    var authors = authorsServices.GetAll();
+    ShowAuthorsData(authors);
 }
+
 void GetAllBooks()
 {
-    Console.WriteLine("Devolviendo lista de libros");
-    var book = booksServices.GetAll();
-    ShowBooksData(book);
+    var books = booksServices.GetAll();
+    ShowBooksData(books);
+}
+
+void ShowAuthorsData(List<Author> authors)
+{
+    Console.WriteLine("Mostrando los datos de autores");
+
+    authors.ForEach(auth => Console.WriteLine($"Id: {auth.Id} Nombre: {auth.Name}"));
+    Console.WriteLine();
+}
+
+void ShowBooksData(List<Book> books)
+{
+    Console.WriteLine("Mostrando los datos de libros");
+
+    books.ForEach(book => Console.WriteLine($"Id: {book.Id} Title: {book.Title} AuthorId: {book.AuthorId} PublishedYear: {book.PublishedYear} Sales: {book.Sales}"));
+    Console.WriteLine();
 }
 
 void GetPublishedBooksByAuthor(string authorName)
 {
     Console.WriteLine($"Mostrando autor {authorName} con libros publicados");
-    
+
     var authorWithBooks = authorsServices.GetPublishedBooksByAuthor(authorName);
 
-    if(authorWithBooks != null)
+    if (authorWithBooks != null)
     {
-        Console.WriteLine($"Id: {authorWithBooks.Id} Nombre: {authorWithBooks.Name}  NumeroLibros: {authorWithBooks.NumberOfBooks}");
+        Console.WriteLine($"Id: {authorWithBooks.Id} Nombre: {authorWithBooks.Name} NumeroLibros: {authorWithBooks.NumberOfBooks}");
     }
+    else
+    {
+        Console.WriteLine($"No se han encontrado datos para el autor {authorName}");
+    }
+    Console.WriteLine();
 }
 
 void DeleteAuthorById(int id)
 {
-    Console.WriteLine($"Eliminando Autor con ID: {id}");
-    var deleteRows = authorsServices.Delete(id);
+    Console.WriteLine($"Eliminando autor con id {id}");
+    var deletedRows = authorsServices.Delete(id);
 
-    if (deleteRows == 0)
+    if (deletedRows == 0)
     {
-        Console.WriteLine($" No se ha podido encontrar ningun autor con el ID: {id} en la base de datos");
+        Console.WriteLine($"No se ha encontrado ningún autor con el id {id} en la DB");
     }
     else
     {
-        Console.WriteLine($"Se ha eliminado {deleteRows} autor / autores de la base de datos");
+        Console.WriteLine($"Se han eliminado {deletedRows} autores de la DB");
     }
+    Console.WriteLine();
 }
 
 void DeleteBookById(int id)
 {
-    Console.WriteLine($"Eliminando Libro con ID: {id}");
-    var deleteRows = booksServices.Delete(id);
+    Console.WriteLine($"Eliminando libro con id {id}");
+    var deletedRows = booksServices.Delete(id);
 
-    if (deleteRows == 0)
+    if (deletedRows == 0)
     {
-        Console.WriteLine($"No se ha podido encontrar ningun libro con el ID: {id} en la base de datos");
-    }
-    else 
-    {
-        Console.WriteLine($"SE ha eliminado {deleteRows} libro / libros de la base de datos");
-    }
-}
-void UpdateBookTitle(int Id, string newTitle)
-{
-    Console.WriteLine($"Actualizando el titulo del libro con ID: {Id} a {newTitle}");
-    var updatedRows = booksServices.Update(Id, newTitle);
-
-    if (updatedRows == 0) 
-    {
-        Console.WriteLine($"No se ha encontrado ningún libro con el ID: {Id} en la base de datos");
+        Console.WriteLine($"No se ha encontrado ningún libro con el id {id} en la DB");
     }
     else
     {
-        Console.WriteLine($"Se ha actualizado {updatedRows} libro / libros de la base de datos");
+        Console.WriteLine($"Se han eliminado {deletedRows} libros de la DB");
     }
+    Console.WriteLine();
 }
 
-static void ShowAuthorsData(List<Author> authors)
+void UpdateBookTitle(int id, string newTitle)
 {
-    Console.WriteLine("Mostrando datos autores");
-    authors.ForEach(auth => Console.WriteLine($"Id: {auth.Id} Nombre: {auth.Name}"));
-}
+    Console.WriteLine($"Actualizando el titulo del libro con id {id} a {newTitle}");
 
-static void ShowBooksData(List<Book> books)
-{
-    Console.WriteLine("Mostrando datos libros");
-    books.ForEach(book => Console.WriteLine($"Id: {book.Id} Title: {book.Title}  AuthorId: {book.AuthorId} PublishedYear: {book.PublishedYear} Sales: {book.Sales}"));
+    var updatedRows = booksServices.Update(id, newTitle);
+
+    if (updatedRows == 0)
+    {
+        Console.WriteLine($"No se ha encontrado ningún libro con el id {id} en la DB");
+    }
+    else
+    {
+        Console.WriteLine($"Se han actualizado {updatedRows} libros de la DB");
+    }
+    Console.WriteLine();
+
+    GetAllBooks();
 }

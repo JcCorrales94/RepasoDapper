@@ -1,4 +1,4 @@
-﻿using Dapper;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RepasoDapper.Entities.Authors;
 using System;
@@ -13,70 +13,51 @@ namespace RepasoDapper.Repositorie.Authors
 {
     public class AuthorsRepository : IAuthorsRepository
     {
-        private IDbConnection? connection;
-        string _connectionString;
+        readonly DatabaseContext _databaseContext;
 
-        readonly IConfiguration _configuration;
-
-        public AuthorsRepository(IConfiguration configuration)
+        public AuthorsRepository(DatabaseContext databaseContext)
         {
-            _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("DefaultConnectionString");
+            _databaseContext = databaseContext;
         }
-
 
         public void Clean()
         {
-            var query = "TRUNCATE TABLE Authors";
-
-            using (IDbConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Execute(query);
-            }
+            _databaseContext.Database.ExecuteSqlRaw("DELETE FROM Authors; DBCC CHECKIDENT('EjercicioEFCore.dbo.Authors', RESEED, 0)");
         }
 
         public int Delete(int Id)
         {
-            var query = "DELETE FROM Authors WHERE Id = @Id";
-            
-            using (IDbConnection connection = new SqlConnection(_connectionString))
+            //? MÉTODO DE HACER UN DELETE HASTA LA ÚLTIMA VERSION DE ENTITY FRAMEWORK
+          
+            var author = _databaseContext.Authors.Where(x => x.Id == Id).FirstOrDefault();
+            if (author != null)
             {
-              return  connection.Execute(query, new { Id });
+                _databaseContext.Remove(author);
+                return _databaseContext.SaveChanges();
             }
-        
+            return 0;
         }
 
         public List<Author> GetAll()
         {
-            var query = "SELECT * FROM Authors";
-
-            using (IDbConnection connection = new SqlConnection(_connectionString))
-            {
-                return connection.Query<Author>(query).ToList();
-            }
-        }
-
-        public int Insert(Author authors)
-        {
-            var query = "INSERT INTO Authors (Name) OUTPUT INSERTED.* VALUES(@Name)";
-            using (IDbConnection connection = new SqlConnection(_connectionString))
-            {
-                var insertedAuthor = connection.QuerySingle<Author>(query, new { Name = authors.Name});
-                return insertedAuthor.Id;
-            }
+            return _databaseContext.Authors.ToList();
         }
 
         public AuthorExtended? GetPublishedBooksByAuthor(string authorName)
         {
-            var query = @"SELECT Count(book.AuthorId) as NumberOfBooks, book.AuthorId as Id, author.Name
-                         FROM Authors author
-                         INNER JOIN Books book on book.AuthorId = author.id
-                         WHERE author.Name = @AuthorName
-                         GROUP BY book.AuthorId, author.Name";
-            using (IDbConnection connection = new SqlConnection(_connectionString))
-            {
-                return connection.Query<AuthorExtended>(query, new { AuthorName = authorName }).FirstOrDefault();
-            }
+            return (from author in _databaseContext.Authors
+                    join book in _databaseContext.Books on author.Id equals book.AuthorId
+                    where author.Name == authorName
+                    group book by new { book.AuthorId, author.Name } into groupedBooks
+                    select new AuthorExtended { Id = groupedBooks.Key.AuthorId, Name = groupedBooks.Key.Name, NumberOfBooks = groupedBooks.Count() }
+                     ).FirstOrDefault();
+        }
+
+        public int Insert(Author authors)
+        {
+            _databaseContext.Authors.Add(authors);
+           return _databaseContext.SaveChanges();
+            
         }
     }
 }
